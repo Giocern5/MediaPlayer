@@ -59,6 +59,7 @@ android {
 
 dependencies {
 
+    implementation(libs.navigation.compose)
     ksp(libs.dagger.hilt.compiler)
 
     implementation(libs.androidx.core.ktx)

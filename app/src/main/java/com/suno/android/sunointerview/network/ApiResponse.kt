@@ -1,4 +1,4 @@
-package com.suno.android.sunointerview
+package com.suno.android.sunointerview.network
 import kotlinx.serialization.Serializable
 
 import kotlinx.serialization.SerialName
