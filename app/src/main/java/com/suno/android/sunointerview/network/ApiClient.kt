@@ -1,5 +1,6 @@
 package com.suno.android.sunointerview.network
 
+import com.suno.android.sunointerview.data.ApiResponse
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
