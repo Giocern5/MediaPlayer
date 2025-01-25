@@ -17,6 +17,7 @@ class MediaFeedRepositoryImpl @Inject constructor(private val mediaService: Medi
     companion object {
         const val TAG = "MediaFeedRepositoryImpl"
     }
+
     override fun getSongs(): Flow<PagingData<Song>> {
         Log.e(TAG, "Fetching songs")
         return Pager(
@@ -26,6 +27,6 @@ class MediaFeedRepositoryImpl @Inject constructor(private val mediaService: Medi
             ),
             pagingSourceFactory = { MediaFeedPagingSource(mediaService) }
         ).flow
-
     }
+
 }
