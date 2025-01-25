@@ -3,7 +3,6 @@ import kotlinx.serialization.Serializable
 
 import kotlinx.serialization.SerialName
 
-
 @Serializable
 data class ApiResponse(
     @SerialName("end") val end: Int?,
@@ -42,6 +41,26 @@ data class Song(
     @SerialName("video_url") val videoUrl: String?
 )
 
+// defaults. will change after seeing what i want to use
+fun Song.toFeedSong(): Song {
+    return this.copy(
+        audioUrl = audioUrl ?: "",
+        avatarImageUrl = avatarImageUrl ?: "",
+        createdAt = createdAt ?: "",
+        displayName = displayName ?: "",
+        handle = handle ?: "",
+        id = id ?: "",
+        imageLargeUrl = imageLargeUrl ?: "",
+        imageUrl = imageUrl ?: "",
+        majorModelVersion = majorModelVersion ?: "",
+        modelName = modelName ?: "",
+        status = status ?: "",
+        title = title ?: "",
+        userId = userId ?: "",
+        videoUrl = videoUrl ?: ""
+    )
+}
+
 @Serializable
 data class Metadata(
     @SerialName("concat_history") val concatHistory: List<ConcatHistory?>?,
@@ -66,3 +85,4 @@ data class ConcatHistory(
     @SerialName("continue_at") val continueAt: Double?,
     @SerialName("id") val id: String?
 )
+

@@ -60,6 +60,7 @@ android {
 dependencies {
 
     implementation(libs.navigation.compose)
+    implementation(libs.androidx.paging.common.android)
     ksp(libs.dagger.hilt.compiler)
 
     implementation(libs.androidx.core.ktx)

@@ -1,6 +1,8 @@
 package com.suno.android.sunointerview.di
 
 import android.content.Context
+import com.suno.android.sunointerview.data.repository.MediaFeedRepository
+import com.suno.android.sunointerview.data.repository.MediaFeedRepositoryImpl
 import com.suno.android.sunointerview.network.MediaService
 import dagger.Module
 import dagger.Provides
@@ -36,6 +38,11 @@ object NetworkModule {
             .build()
 
         return instance.create(MediaService::class.java)
+    }
+
+    @Provides
+    fun MediaFeedRepository(service: MediaService): MediaFeedRepository {
+        return MediaFeedRepositoryImpl(service)
     }
 
     // is this needed? revisit

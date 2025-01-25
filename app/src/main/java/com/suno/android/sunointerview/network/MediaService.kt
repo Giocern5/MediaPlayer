@@ -12,5 +12,5 @@ interface MediaService {
         @Query("page") page: Int = 1,
         @Query("page_size") pageSize: Int = 10
     ) : Response<ApiResponse>
-    
+
 }
