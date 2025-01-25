@@ -9,11 +9,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType
-import retrofit2.Converter
 import retrofit2.Retrofit
-import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 private const val BASE_URL = "https://apitest.suno.com/api/"
@@ -34,7 +31,7 @@ object NetworkModule {
         val instance = Retrofit
             .Builder()
             .baseUrl(BASE_URL)
-            .addConverterFactory(generateConverterFactory())
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         return instance.create(MediaService::class.java)
@@ -45,14 +42,4 @@ object NetworkModule {
         return MediaFeedRepositoryImpl(service)
     }
 
-    // is this needed? revisit
-    private fun generateConverterFactory(): Converter.Factory {
-        val json = Json {
-            ignoreUnknownKeys = true
-            isLenient = true
-        }
-
-        val contentType = MediaType.get("application/json")
-        return json.asConverterFactory(contentType)
-    }
 }

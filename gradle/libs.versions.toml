@@ -2,6 +2,8 @@
 agp = "8.5.0"
 animation = "1.6.8"
 browser = "1.8.0"
+converterGson = "2.9.0'"
+converterGsonVersion = "2.9.0"
 datastorePreferencesCore = "1.1.1"
 flowCallAdapterFactory = "1.0.0"
 foundation = "1.6.8"
@@ -50,6 +52,7 @@ androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomVers
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomVersion" }
 androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "roomVersion" }
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "roomVersion" }
+converter-gson = { module = "implementation 'com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 flow-call-adapter-factory = { module = "tech.thdev:flow-call-adapter-factory", version.ref = "flowCallAdapterFactory" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -88,6 +91,7 @@ coil-core = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 coil-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
 play-services-cast-framework = { group = "com.google.android.gms", name = "play-services-cast-framework", version.ref = "cast" }
+retrofit2-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGsonVersion" }
 ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationComposeVersion" }

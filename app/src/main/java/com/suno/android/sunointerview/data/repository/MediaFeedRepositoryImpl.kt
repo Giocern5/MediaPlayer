@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.suno.android.sunointerview.data.Song
+import com.suno.android.sunointerview.data.SongFeedData
 import com.suno.android.sunointerview.data.paging.MediaFeedPagingSource
 import com.suno.android.sunointerview.network.MediaService
 import kotlinx.coroutines.flow.Flow
@@ -18,7 +18,7 @@ class MediaFeedRepositoryImpl @Inject constructor(private val mediaService: Medi
         const val TAG = "MediaFeedRepositoryImpl"
     }
 
-    override fun getSongs(): Flow<PagingData<Song>> {
+    override fun getSongs(): Flow<PagingData<SongFeedData>> {
         Log.e(TAG, "Fetching songs")
         return Pager(
             config = PagingConfig(

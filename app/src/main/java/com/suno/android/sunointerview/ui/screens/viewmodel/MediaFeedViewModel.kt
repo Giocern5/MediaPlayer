@@ -2,13 +2,13 @@ package com.suno.android.sunointerview.ui.screens.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagingData
-import com.suno.android.sunointerview.data.Song
 import com.suno.android.sunointerview.data.repository.MediaFeedRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import androidx.paging.cachedIn
 import androidx.lifecycle.*
+import com.suno.android.sunointerview.data.SongFeedData
 
 @HiltViewModel
 class MediaFeedViewModel @Inject constructor(
@@ -19,7 +19,7 @@ class MediaFeedViewModel @Inject constructor(
         const val TAG = "MediaFeedViewModel"
     }
 
-    val pagingFlow: Flow<PagingData<Song>> = repo.getSongs()
+    val pagingFlow: Flow<PagingData<SongFeedData>> = repo.getSongs()
         .cachedIn(viewModelScope)
 
 }

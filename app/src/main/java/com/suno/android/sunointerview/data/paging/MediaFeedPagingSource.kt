@@ -4,27 +4,27 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import okio.IOException
 import android.util.Log
-import com.suno.android.sunointerview.data.Song
+import com.suno.android.sunointerview.data.SongFeedData
 import com.suno.android.sunointerview.data.toFeedSong
 import com.suno.android.sunointerview.network.MediaService
 import javax.inject.Inject
 
 class MediaFeedPagingSource @Inject constructor (
     private val mediaService: MediaService,
-): PagingSource<Int, Song>()  {
+): PagingSource<Int, SongFeedData>()  {
 
     companion object {
         const val TAG = "MediaFeedPagingSource"
     }
 
-    override fun getRefreshKey(state: PagingState<Int, Song>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, SongFeedData>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
                 ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
         }
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Song> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, SongFeedData> {
         return try {
             val page = params.key ?: 1
             val pageSize = params.loadSize

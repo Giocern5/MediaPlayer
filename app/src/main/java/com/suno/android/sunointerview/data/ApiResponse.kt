@@ -41,23 +41,24 @@ data class Song(
     @SerialName("video_url") val videoUrl: String?
 )
 
+data class SongFeedData(
+    val id: String,
+    val userId: String,
+    val audioUrl: String,
+    val title: String,
+    val imageLargeUrl: String,
+    val imageUrl: String
+)
+
 // defaults. will change after seeing what i want to use
-fun Song.toFeedSong(): Song {
-    return this.copy(
+fun Song.toFeedSong(): SongFeedData {
+    return SongFeedData(
         audioUrl = audioUrl ?: "",
-        avatarImageUrl = avatarImageUrl ?: "",
-        createdAt = createdAt ?: "",
-        displayName = displayName ?: "",
-        handle = handle ?: "",
         id = id ?: "",
         imageLargeUrl = imageLargeUrl ?: "",
         imageUrl = imageUrl ?: "",
-        majorModelVersion = majorModelVersion ?: "",
-        modelName = modelName ?: "",
-        status = status ?: "",
         title = title ?: "",
         userId = userId ?: "",
-        videoUrl = videoUrl ?: ""
     )
 }
 
