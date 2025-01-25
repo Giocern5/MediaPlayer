@@ -1,44 +1,43 @@
 package com.suno.android.sunointerview.data
-import kotlinx.serialization.Serializable
 
-import kotlinx.serialization.SerialName
+import com.google.gson.annotations.SerializedName
 
-@Serializable
+
 data class ApiResponse(
-    @SerialName("end") val end: Int?,
-    @SerialName("page") val page: Int?,
-    @SerialName("per_page") val perPage: Int?,
-    @SerialName("songs") val songs: List<Song?>?,
-    @SerialName("start") val start: Int?,
-    @SerialName("total_pages") val totalPages: Int?,
-    @SerialName("total_songs") val totalSongs: Int?
+    @SerializedName("end") val end: Int?,
+    @SerializedName("page") val page: Int?,
+    @SerializedName("per_page") val perPage: Int?,
+    @SerializedName("songs") val songs: List<Song?>?,
+    @SerializedName("start") val start: Int?,
+    @SerializedName("total_pages") val totalPages: Int?,
+    @SerializedName("total_songs") val totalSongs: Int?
 )
 
-@Serializable
+
 data class Song(
-    @SerialName("audio_url") val audioUrl: String?,
-    @SerialName("avatar_image_url") val avatarImageUrl: String?,
-    @SerialName("created_at") val createdAt: String?,
-    @SerialName("display_name") val displayName: String?,
-    @SerialName("handle") val handle: String?,
-    @SerialName("id") val id: String?,
-    @SerialName("image_large_url") val imageLargeUrl: String?,
-    @SerialName("image_url") val imageUrl: String?,
-    @SerialName("is_handle_updated") val isHandleUpdated: Boolean?,
-    @SerialName("is_liked") val isLiked: Boolean?,
-    @SerialName("is_public") val isPublic: Boolean?,
-    @SerialName("is_trashed") val isTrashed: Boolean?,
-    @SerialName("is_video_pending") val isVideoPending: Boolean?,
-    @SerialName("major_model_version") val majorModelVersion: String?,
-    @SerialName("metadata") val metadata: Metadata?,
-    @SerialName("model_name") val modelName: String?,
-    @SerialName("play_count") val playCount: Int?,
-    @SerialName("reaction") val reaction: Reaction?,
-    @SerialName("status") val status: String?,
-    @SerialName("title") val title: String?,
-    @SerialName("upvote_count") val upvoteCount: Int?,
-    @SerialName("user_id") val userId: String?,
-    @SerialName("video_url") val videoUrl: String?
+    @SerializedName("audio_url") val audioUrl: String?,
+    @SerializedName("avatar_image_url") val avatarImageUrl: String?,
+    @SerializedName("created_at") val createdAt: String?,
+    @SerializedName("display_name") val displayName: String?,
+    @SerializedName("handle") val handle: String?,
+    @SerializedName("id") val id: String?,
+    @SerializedName("image_large_url") val imageLargeUrl: String?,
+    @SerializedName("image_url") val imageUrl: String?,
+    @SerializedName("is_handle_updated") val isHandleUpdated: Boolean?,
+    @SerializedName("is_liked") val isLiked: Boolean?,
+    @SerializedName("is_public") val isPublic: Boolean?,
+    @SerializedName("is_trashed") val isTrashed: Boolean?,
+    @SerializedName("is_video_pending") val isVideoPending: Boolean?,
+    @SerializedName("major_model_version") val majorModelVersion: String?,
+    @SerializedName("metadata") val metadata: Metadata?,
+    @SerializedName("model_name") val modelName: String?,
+    @SerializedName("play_count") val playCount: Int?,
+    @SerializedName("reaction") val reaction: Reaction?,
+    @SerializedName("status") val status: String?,
+    @SerializedName("title") val title: String?,
+    @SerializedName("upvote_count") val upvoteCount: Int?,
+    @SerializedName("user_id") val userId: String?,
+    @SerializedName("video_url") val videoUrl: String?
 )
 
 data class SongFeedData(
@@ -62,28 +61,25 @@ fun Song.toFeedSong(): SongFeedData {
     )
 }
 
-@Serializable
 data class Metadata(
-    @SerialName("concat_history") val concatHistory: List<ConcatHistory?>?,
-    @SerialName("duration") val duration: Double?,
-    @SerialName("prompt") val prompt: String?,
-    @SerialName("tags") val tags: String?,
-    @SerialName("type") val type: String?
+    @SerializedName("concat_history") val concatHistory: List<ConcatHistory?>?,
+    @SerializedName("duration") val duration: Double?,
+    @SerializedName("prompt") val prompt: String?,
+    @SerializedName("tags") val tags: String?,
+    @SerializedName("type") val type: String?
 )
 
-@Serializable
 data class Reaction(
-    @SerialName("clip") val clip: String?,
-    @SerialName("flagged") val flagged: Boolean?,
-    @SerialName("play_count") val playCount: Int?,
-    @SerialName("reaction_type") val reactionType: String?,
-    @SerialName("skip_count") val skipCount: Int?,
-    @SerialName("updated_at") val updatedAt: String?
+    @SerializedName("clip") val clip: String?,
+    @SerializedName("flagged") val flagged: Boolean?,
+    @SerializedName("play_count") val playCount: Int?,
+    @SerializedName("reaction_type") val reactionType: String?,
+    @SerializedName("skip_count") val skipCount: Int?,
+    @SerializedName("updated_at") val updatedAt: String?
 )
 
-@Serializable
 data class ConcatHistory(
-    @SerialName("continue_at") val continueAt: Double?,
-    @SerialName("id") val id: String?
+    @SerializedName("continue_at") val continueAt: Double?,
+    @SerializedName("id") val id: String?
 )
 

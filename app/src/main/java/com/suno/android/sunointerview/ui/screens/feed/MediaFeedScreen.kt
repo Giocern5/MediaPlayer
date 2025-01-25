@@ -1,6 +1,5 @@
 package com.suno.android.sunointerview.ui.screens.feed
 
-import android.media.MediaPlayer
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,7 +19,6 @@ import androidx.paging.compose.LazyPagingItems
 import com.suno.android.sunointerview.ui.screens.viewmodel.MediaFeedViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CardDefaults
 import android.util.Log
 import coil.compose.AsyncImage
 import com.suno.android.sunointerview.data.SongFeedData
@@ -67,15 +65,18 @@ fun SongItem(song: SongFeedData) {
             .fillMaxWidth()
             .height(200.dp),
         shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
-        AsyncImage(
-            model = song.imageLargeUrl,
-            contentDescription = "Article Image",
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-        )
+        if(song.imageLargeUrl.isEmpty()) {
+            Text("Okay emoty")
+        } else {
+            AsyncImage(
+                model = song.imageLargeUrl,
+                contentDescription = "Article Image",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+            )
+        }
     }
 }
 
