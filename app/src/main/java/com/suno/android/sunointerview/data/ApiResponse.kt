@@ -49,6 +49,8 @@ data class SongFeedData(
     val avatarImageUrl: String,
     val displayName: String,
     val isLiked: Boolean,
+    val isTrashed: Boolean,
+    val likes: Int
 )
 
 // defaults. will change after seeing what i want to use
@@ -61,7 +63,9 @@ fun Song.toFeedSong(): SongFeedData {
         userId = userId ?: "",
         avatarImageUrl = avatarImageUrl ?: "",
         displayName = displayName ?: "",
-        isLiked = isLiked ?: false
+        isLiked = isLiked ?: false,
+        isTrashed = isTrashed ?: false,
+        likes = upvoteCount ?: 0
     )
 }
 

@@ -1,7 +1,6 @@
 package com.suno.android.sunointerview.ui.screens.feed
 
 import android.media.MediaPlayer
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
@@ -55,13 +54,13 @@ import com.suno.android.sunointerview.data.SongFeedData
 
 import  com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.suno.android.sunointerview.uitls.StringUtil
 
 // App crashed on screen rotation, look into it
 // Fix button section,
 // if song ends, swipe to next or maybe restart?
 // update naming conventions
 // progress bar for song?
-// add is_hated to mapper
 // lower play bottom / restart
 
 @Composable
@@ -135,7 +134,7 @@ fun SongItem(song: SongFeedData, mediaPlayer: MediaPlayer) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-
+            // Background image
             AsyncImage(
                 model = song.imageLargeUrl,
                 contentDescription = "Background Image",
@@ -143,6 +142,7 @@ fun SongItem(song: SongFeedData, mediaPlayer: MediaPlayer) {
                 contentScale = ContentScale.Crop
             )
 
+            // Blur effect at the bottom
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -162,28 +162,38 @@ fun SongItem(song: SongFeedData, mediaPlayer: MediaPlayer) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.BottomStart)
+                    .align(Alignment.BottomCenter)
                     .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
             ) {
+
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                        .padding(bottom = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)
                 ) {
                     UserInfoSection(song)
                     SongControls(songUrl = song.audioUrl, mediaPlayer = mediaPlayer)
                 }
 
-                ButtonSection(song.isLiked)
+                Column(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .padding(bottom = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)
+                ) {
+                    ButtonSection(song.isLiked, song.isTrashed, song.likes)
+                }
             }
         }
     }
 }
 
+
 @Composable
-fun ButtonSection(isLiked: Boolean) {
+fun ButtonSection(isLiked: Boolean, isTrashed: Boolean, likes: Int) {
     Column(
         modifier = Modifier
             .wrapContentSize()
@@ -192,17 +202,26 @@ fun ButtonSection(isLiked: Boolean) {
     ) {
 
         IconButton(onClick = { /* toast? */ }) {
-            Icon(
-                imageVector = Icons.Rounded.ThumbUp,
-                contentDescription = "Like",
-                tint =  if(isLiked) Color.Red else  MaterialTheme.colorScheme.background
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.ThumbUp,
+                    contentDescription = "Like",
+                    tint = if (isLiked) Color.Red else MaterialTheme.colorScheme.background
+                )
+                Text(
+                    text = StringUtil.formatNumberToCompactString(likes),
+                    style = MaterialTheme.typography.labelSmall,
+                )
+            }
         }
+        //Created dislike button as it is not a default icons
         IconButton(onClick = { /* toast? */ }) {
             Icon(
                 imageVector = Icons.Rounded.ThumbUp,
                 contentDescription = "Dislike",
-                tint = if (isLiked) Color.Red else MaterialTheme.colorScheme.background,
+                tint = if (isTrashed) Color.Red else MaterialTheme.colorScheme.background,
                 modifier = Modifier.graphicsLayer(rotationZ = 180f, rotationY = 180f)
             )
         }
