@@ -163,14 +163,14 @@ fun SongItem(song: SongFeedData, mediaPlayer: MediaPlayer) {
                     SongControls(songUrl = song.audioUrl, mediaPlayer = mediaPlayer)
                 }
 
-                ButtonSection()
+                ButtonSection(song.isLiked)
             }
         }
     }
 }
 
 @Composable
-fun ButtonSection() {
+fun ButtonSection(isLiked: Boolean) {
     Column(
         modifier = Modifier
             .wrapContentSize()
@@ -182,7 +182,7 @@ fun ButtonSection() {
             Icon(
                 imageVector = Icons.Default.ThumbUp,
                 contentDescription = "Like",
-                tint = MaterialTheme.colorScheme.background
+                tint =  if(isLiked) Color.Red else  MaterialTheme.colorScheme.background
             )
         }
 
