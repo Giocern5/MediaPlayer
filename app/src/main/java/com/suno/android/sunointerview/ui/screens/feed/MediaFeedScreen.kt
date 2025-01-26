@@ -1,12 +1,20 @@
 package com.suno.android.sunointerview.ui.screens.feed
 
+import android.media.MediaPlayer
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,62 +27,256 @@ import androidx.paging.compose.LazyPagingItems
 import com.suno.android.sunointerview.ui.screens.viewmodel.MediaFeedViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.compose.foundation.shape.RoundedCornerShape
-import android.util.Log
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
 import com.suno.android.sunointerview.data.SongFeedData
+
+
+// App crashed on screen rotation, look into it
+// Fix button section,
+// if song ends, swipe to next or maybe restart?
+// update like button
+// add dislike button
+// see what buttons are available as Material3 does not have all
+// update naming conventions
+// play / pause button
+// progress bar for song?
 
 @Composable
 fun MediaFeedScreen(viewModel: MediaFeedViewModel) {
 
     val songs = viewModel.pagingFlow.collectAsLazyPagingItems()
+    val sharedMediaPlayer = remember { MediaPlayer() }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        SongsList( songs )
+        SongsList(songs = songs, mediaPlayer = sharedMediaPlayer)
     }
 
+    DisposableEffect(Unit) {
+        onDispose {
+            sharedMediaPlayer.release()
+        }
+    }
 }
 
 @Composable
-fun SongsList(songs: LazyPagingItems<SongFeedData>) {
-
+fun SongsList(songs: LazyPagingItems<SongFeedData>, mediaPlayer: MediaPlayer) {
     when (songs.loadState.refresh) {
         is LoadState.Error -> {
-        CenterContainer("Ooops, something went wrong! Please check internet or try again")
-    }
-        is LoadState.Loading -> { }
+            CenterContainer("Ooops, something went wrong! Please check internet or try again")
+        }
+        is LoadState.Loading -> {}
         is LoadState.NotLoading -> {
-            LazyColumn {
+            //used for snapping behavior
+            val listState = rememberLazyListState()
+            val flingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
+
+            LazyColumn(
+                state = listState,
+                flingBehavior = flingBehavior
+            ) {
                 items(songs.itemCount) { index ->
                     songs[index]?.let {
-                        SongItem(song = it)
+                        SongItem(song = it, mediaPlayer = mediaPlayer)
                     }
                 }
             }
         }
     }
-
 }
 
 @Composable
-fun SongItem(song: SongFeedData) {
-
-    Log.e("URL", song.imageLargeUrl)
+fun SongItem(song: SongFeedData, mediaPlayer: MediaPlayer) {
     Card(
         modifier = Modifier
-            .padding(8.dp)
             .fillMaxWidth()
-            .height(200.dp),
+            .aspectRatio(9f / 16f)
+            .padding(8.dp),
         shape = RoundedCornerShape(8.dp),
     ) {
-        if(song.imageLargeUrl.isEmpty()) {
-            Text("Okay emoty")
-        } else {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
             AsyncImage(
                 model = song.imageLargeUrl,
-                contentDescription = "Article Image",
+                contentDescription = "Background Image",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+
+            Row(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .align(Alignment.BottomStart)
                     .padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(
+                            color = Color.Black.copy(alpha = 0.70f),
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                        .padding(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    UserInfoSection(song)
+                    SongControls(songUrl = song.audioUrl, mediaPlayer = mediaPlayer)
+                }
+
+                ButtonSection()
+            }
+        }
+    }
+}
+
+@Composable
+fun ButtonSection() {
+    Column(
+        modifier = Modifier
+            .wrapContentSize()
+            .background(
+                color = Color.Black.copy(alpha = 0.70f),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+
+        IconButton(onClick = { /* toast? */ }) {
+            Icon(
+                imageVector = Icons.Default.ThumbUp,
+                contentDescription = "Like",
+                tint = Color.White
+            )
+        }
+
+        IconButton(onClick = { /* toast? */ }) {
+            Icon(
+                imageVector = Icons.Default.Share,
+                contentDescription = "Share",
+                tint = Color.White
+            )
+        }
+
+        IconButton(onClick = { /* toast? */ }) {
+            Icon(
+                imageVector = Icons.Default.Menu,
+                contentDescription = "Menu",
+                tint = Color.White
+            )
+        }
+    }
+}
+
+@Composable
+fun UserInfoSection(song: SongFeedData) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+
+        Text(
+            text = song.title,
+            style = MaterialTheme.typography.titleLarge.copy(
+                color = Color.White
+            ),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        ) {
+            AsyncImage(
+                model = song.avatarImageUrl,
+                contentDescription = "Avatar Image",
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(RoundedCornerShape(16.dp))
+            )
+            Text(
+                text = song.displayName,
+                style = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun SongControls(songUrl: String, mediaPlayer: MediaPlayer) {
+
+    var isPlaying by remember { mutableStateOf(false) }
+
+    DisposableEffect(songUrl) {
+        mediaPlayer.reset()
+        mediaPlayer.setDataSource(songUrl)
+        mediaPlayer.prepareAsync()
+        mediaPlayer.setOnPreparedListener {
+            mediaPlayer.start()
+            isPlaying = true
+        }
+        onDispose {
+            mediaPlayer.stop()
+        }
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+
+        IconButton(
+            onClick = {
+                mediaPlayer.seekTo(0)
+                if (!isPlaying) {
+                    mediaPlayer.start()
+                    isPlaying = true
+                }
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = "Restart",
+                tint = Color.White
+            )
+        }
+
+        IconButton(
+            onClick = {
+                if (isPlaying) {
+                    mediaPlayer.pause()
+                    isPlaying = false
+                } else {
+                    mediaPlayer.start()
+                    isPlaying = true
+                }
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Default.PlayArrow,
+                contentDescription = "Play button",
+                tint = Color.White
             )
         }
     }
@@ -85,8 +287,7 @@ fun CenterContainer(message: String) {
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+            .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
