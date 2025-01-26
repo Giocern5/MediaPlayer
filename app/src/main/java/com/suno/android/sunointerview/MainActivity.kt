@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            SunoInterviewTheme {
+            SunoInterviewTheme(dynamicColor = false) {
                 MediaApp()
             }
         }

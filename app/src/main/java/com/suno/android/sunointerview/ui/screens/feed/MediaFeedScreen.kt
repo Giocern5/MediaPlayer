@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -40,7 +41,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
@@ -64,7 +67,12 @@ fun MediaFeedScreen(viewModel: MediaFeedViewModel) {
     val songs = viewModel.pagingFlow.collectAsLazyPagingItems()
     val sharedMediaPlayer = remember { MediaPlayer() }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+            color = MaterialTheme.colorScheme.surfaceContainer
+        ),) {
         SongsList(songs = songs, mediaPlayer = sharedMediaPlayer)
     }
 
@@ -120,6 +128,24 @@ fun SongItem(song: SongFeedData, mediaPlayer: MediaPlayer) {
                 contentScale = ContentScale.Crop
             )
 
+            // Blur effect box at the bottom
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp) // Extend the blur area
+                    .align(Alignment.BottomCenter)
+                    .blur(64.dp) // Stronger blur
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent, // Top of the gradient
+                                Color.Black.copy(alpha = 0.7f) // Bottom of the gradient
+                            )
+                        )
+                    )
+            )
+                {}
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -130,10 +156,6 @@ fun SongItem(song: SongFeedData, mediaPlayer: MediaPlayer) {
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .background(
-                            color = Color.Black.copy(alpha = 0.70f),
-                            shape = RoundedCornerShape(16.dp)
-                        )
                         .padding(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -152,10 +174,6 @@ fun ButtonSection() {
     Column(
         modifier = Modifier
             .wrapContentSize()
-            .background(
-                color = Color.Black.copy(alpha = 0.70f),
-                shape = RoundedCornerShape(16.dp)
-            )
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -164,7 +182,7 @@ fun ButtonSection() {
             Icon(
                 imageVector = Icons.Default.ThumbUp,
                 contentDescription = "Like",
-                tint = Color.White
+                tint = MaterialTheme.colorScheme.background
             )
         }
 
@@ -172,7 +190,7 @@ fun ButtonSection() {
             Icon(
                 imageVector = Icons.Default.Share,
                 contentDescription = "Share",
-                tint = Color.White
+                tint = MaterialTheme.colorScheme.background
             )
         }
 
@@ -180,7 +198,7 @@ fun ButtonSection() {
             Icon(
                 imageVector = Icons.Default.Menu,
                 contentDescription = "Menu",
-                tint = Color.White
+                tint = MaterialTheme.colorScheme.background
             )
         }
     }
@@ -194,10 +212,8 @@ fun UserInfoSection(song: SongFeedData) {
 
         Text(
             text = song.title,
-            style = MaterialTheme.typography.titleLarge.copy(
-                color = Color.White
-            ),
-            maxLines = 1,
+            style = MaterialTheme.typography.titleLarge,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
 
@@ -214,7 +230,7 @@ fun UserInfoSection(song: SongFeedData) {
             )
             Text(
                 text = song.displayName,
-                style = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
+                style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.padding(start = 8.dp)
             )
         }
@@ -293,9 +309,7 @@ fun CenterContainer(message: String) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = message,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.primary
-                ),
+                style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
         }
