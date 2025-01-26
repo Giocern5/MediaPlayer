@@ -59,6 +59,7 @@ android {
 
 dependencies {
 
+    implementation (libs.accompanist.swiperefresh)
     implementation(libs.retrofit2.converter.gson)
 
     implementation(libs.coil.compose)

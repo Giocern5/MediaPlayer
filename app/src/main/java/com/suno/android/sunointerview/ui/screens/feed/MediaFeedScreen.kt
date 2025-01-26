@@ -1,6 +1,7 @@
 package com.suno.android.sunointerview.ui.screens.feed
 
 import android.media.MediaPlayer
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
@@ -29,11 +30,12 @@ import com.suno.android.sunointerview.ui.screens.viewmodel.MediaFeedViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.rounded.AccountBox
+import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.rounded.ThumbUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.DisposableEffect
@@ -45,35 +47,46 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
 import com.suno.android.sunointerview.data.SongFeedData
 
+import  com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 // App crashed on screen rotation, look into it
 // Fix button section,
 // if song ends, swipe to next or maybe restart?
-// update like button
-// add dislike button
-// see what buttons are available as Material3 does not have all
 // update naming conventions
-// play / pause button
 // progress bar for song?
+// add is_hated to mapper
+// lower play bottom / restart
 
 @Composable
 fun MediaFeedScreen(viewModel: MediaFeedViewModel) {
-
     val songs = viewModel.pagingFlow.collectAsLazyPagingItems()
     val sharedMediaPlayer = remember { MediaPlayer() }
+    var isRefreshing by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-            color = MaterialTheme.colorScheme.surfaceContainer
-        ),) {
-        SongsList(songs = songs, mediaPlayer = sharedMediaPlayer)
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing)
+
+    SwipeRefresh(
+        state = swipeRefreshState,
+        onRefresh = {
+            isRefreshing = true
+            songs.refresh()
+            isRefreshing = false
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.surfaceContainer)
+        ) {
+            SongsList(songs = songs, mediaPlayer = sharedMediaPlayer)
+        }
     }
 
     DisposableEffect(Unit) {
@@ -82,6 +95,7 @@ fun MediaFeedScreen(viewModel: MediaFeedViewModel) {
         }
     }
 }
+
 
 @Composable
 fun SongsList(songs: LazyPagingItems<SongFeedData>, mediaPlayer: MediaPlayer) {
@@ -121,6 +135,7 @@ fun SongItem(song: SongFeedData, mediaPlayer: MediaPlayer) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
+
             AsyncImage(
                 model = song.imageLargeUrl,
                 contentDescription = "Background Image",
@@ -128,23 +143,21 @@ fun SongItem(song: SongFeedData, mediaPlayer: MediaPlayer) {
                 contentScale = ContentScale.Crop
             )
 
-            // Blur effect box at the bottom
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp) // Extend the blur area
+                    .height(200.dp)
                     .align(Alignment.BottomCenter)
-                    .blur(64.dp) // Stronger blur
+                    .blur(64.dp)
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(
-                                Color.Transparent, // Top of the gradient
-                                Color.Black.copy(alpha = 0.7f) // Bottom of the gradient
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.99f)
                             )
                         )
                     )
             )
-                {}
 
             Row(
                 modifier = Modifier
@@ -180,15 +193,23 @@ fun ButtonSection(isLiked: Boolean) {
 
         IconButton(onClick = { /* toast? */ }) {
             Icon(
-                imageVector = Icons.Default.ThumbUp,
+                imageVector = Icons.Rounded.ThumbUp,
                 contentDescription = "Like",
                 tint =  if(isLiked) Color.Red else  MaterialTheme.colorScheme.background
+            )
+        }
+        IconButton(onClick = { /* toast? */ }) {
+            Icon(
+                imageVector = Icons.Rounded.ThumbUp,
+                contentDescription = "Dislike",
+                tint = if (isLiked) Color.Red else MaterialTheme.colorScheme.background,
+                modifier = Modifier.graphicsLayer(rotationZ = 180f, rotationY = 180f)
             )
         }
 
         IconButton(onClick = { /* toast? */ }) {
             Icon(
-                imageVector = Icons.Default.Share,
+                imageVector = Icons.Rounded.Share,
                 contentDescription = "Share",
                 tint = MaterialTheme.colorScheme.background
             )
@@ -196,7 +217,7 @@ fun ButtonSection(isLiked: Boolean) {
 
         IconButton(onClick = { /* toast? */ }) {
             Icon(
-                imageVector = Icons.Default.Menu,
+                imageVector = Icons.Rounded.Menu,
                 contentDescription = "Menu",
                 tint = MaterialTheme.colorScheme.background
             )
@@ -221,13 +242,26 @@ fun UserInfoSection(song: SongFeedData) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
         ) {
-            AsyncImage(
-                model = song.avatarImageUrl,
-                contentDescription = "Avatar Image",
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(RoundedCornerShape(16.dp))
-            )
+            when {
+                song.avatarImageUrl.isEmpty() -> {
+                    Icon(
+                        imageVector = Icons.Rounded.AccountBox,
+                        contentDescription = "Default Avatar",
+                        tint = MaterialTheme.colorScheme.background
+                    )
+                }
+                else -> {
+                    AsyncImage(
+                        model = song.avatarImageUrl,
+                        contentDescription = "Avatar Image",
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                    )
+            }
+        }
+
+
             Text(
                 text = song.displayName,
                 style = MaterialTheme.typography.labelSmall,
@@ -272,9 +306,9 @@ fun SongControls(songUrl: String, mediaPlayer: MediaPlayer) {
             }
         ) {
             Icon(
-                imageVector = Icons.Default.Refresh,
+                imageVector = Icons.Rounded.Refresh,
                 contentDescription = "Restart",
-                tint = Color.White
+                tint = MaterialTheme.colorScheme.background
             )
         }
 
@@ -290,9 +324,9 @@ fun SongControls(songUrl: String, mediaPlayer: MediaPlayer) {
             }
         ) {
             Icon(
-                imageVector = Icons.Default.PlayArrow,
+                imageVector = Icons.Rounded.PlayArrow,
                 contentDescription = "Play button",
-                tint = Color.White
+                tint = MaterialTheme.colorScheme.background
             )
         }
     }
