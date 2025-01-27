@@ -59,6 +59,10 @@ android {
 
 dependencies {
 
+    implementation (libs.androidx.media3.exoplayer.v111)  // Core ExoPlayer library
+    implementation (libs.androidx.media3.ui.v111)        // Optional UI components
+    implementation (libs.androidx.media3.common.v111)    // Common Media3 features
+    implementation (libs.androidx.media3.session.v111)
     // Import the BoM for the Firebase platform
     implementation(platform(libs.firebase.bom))
 
