@@ -31,6 +31,14 @@ val Typography = Typography(
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp,
         color = Color.White
+    ),
+    labelMedium = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Medium,
+        fontSize = 16.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.5.sp,
+        color = Color.White
     )
 
     /* Other default text styles to override

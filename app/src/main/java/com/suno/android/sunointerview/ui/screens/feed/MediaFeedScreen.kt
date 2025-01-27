@@ -55,10 +55,6 @@ import  com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.suno.android.sunointerview.uitls.StringUtil
 
-// if song ends, swipe to next or maybe restart?
-// update naming conventions
-// per logs, songs still play on fast swipe
-
 @Composable
 fun MediaFeedScreen(viewModel: MediaFeedViewModel) {
     val songs = viewModel.pagingFlow.collectAsLazyPagingItems()
@@ -83,7 +79,6 @@ fun MediaFeedScreen(viewModel: MediaFeedViewModel) {
     }
 }
 
-
 @Composable
 fun SongsList(songs: LazyPagingItems<SongFeedData>, viewModel: MediaFeedViewModel) {
     when (songs.loadState.refresh) {
@@ -92,7 +87,6 @@ fun SongsList(songs: LazyPagingItems<SongFeedData>, viewModel: MediaFeedViewMode
         }
         is LoadState.Loading -> {}
         is LoadState.NotLoading -> {
-            //used for snapping behavior
             val listState = rememberLazyListState()
             val flingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
 
@@ -162,8 +156,8 @@ fun SongItem(song: SongFeedData, viewModel: MediaFeedViewModel) {
                         .padding(bottom = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)
                 ) {
-                    UserInfoSection(song)
-                    SongControls(songUrl = song.audioUrl, songLength = song.songLength, viewModel = viewModel)
+                    SongDetails(song)
+                    SongPlaybackButtons(songUrl = song.audioUrl, songLength = song.songLength, viewModel = viewModel)
                 }
 
                 Column(
@@ -172,7 +166,7 @@ fun SongItem(song: SongFeedData, viewModel: MediaFeedViewModel) {
                         .padding(bottom = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)
                 ) {
-                    ButtonSection(song.isLiked, song.isTrashed, song.likes)
+                    SongActionButtons(song.isLiked, song.isTrashed, song.likes)
                 }
             }
         }
@@ -181,7 +175,7 @@ fun SongItem(song: SongFeedData, viewModel: MediaFeedViewModel) {
 
 
 @Composable
-fun ButtonSection(isLiked: Boolean, isTrashed: Boolean, likes: Int) {
+fun SongActionButtons(isLiked: Boolean, isTrashed: Boolean, likes: Int) {
     Column(
         modifier = Modifier
             .wrapContentSize()
@@ -233,7 +227,7 @@ fun ButtonSection(isLiked: Boolean, isTrashed: Boolean, likes: Int) {
 }
 
 @Composable
-fun UserInfoSection(song: SongFeedData) {
+fun SongDetails(song: SongFeedData) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -278,7 +272,7 @@ fun UserInfoSection(song: SongFeedData) {
 }
 
 @Composable
-fun SongControls(songUrl: String, songLength: Double, viewModel: MediaFeedViewModel) {
+fun SongPlaybackButtons(songUrl: String, songLength: Double, viewModel: MediaFeedViewModel) {
 
     DisposableEffect(songUrl) {
         viewModel.startSong(songUrl)
@@ -320,8 +314,8 @@ fun SongControls(songUrl: String, songLength: Double, viewModel: MediaFeedViewMo
 
         Text(
             text = StringUtil.formatDuration(songLength),
-            style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.padding(bottom = 8.dp)
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.align(Alignment.CenterVertically)
         )
     }
 }
