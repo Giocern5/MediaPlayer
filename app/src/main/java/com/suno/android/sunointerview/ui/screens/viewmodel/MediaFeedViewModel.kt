@@ -43,7 +43,7 @@ class MediaFeedViewModel @Inject constructor(
     fun resetSong() {
         mediaPlayer.seekTo(0)
         mediaPlayer.start()
-        Log.e(TAG, "Resting song")
+        Log.e(TAG, "Restarting song")
     }
 
     fun toggleSong() {
@@ -56,11 +56,6 @@ class MediaFeedViewModel @Inject constructor(
                 Log.e(TAG, "Continuing song")
             }
         }
-    }
-
-    fun stopSong() {
-        mediaPlayer.stop()
-        Log.e(TAG, "Stopping song")
     }
 
     override fun onCleared() {

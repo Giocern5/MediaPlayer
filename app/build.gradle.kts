@@ -59,6 +59,8 @@ android {
 
 dependencies {
 
+    implementation( libs.accompanist.pager)
+
     implementation (libs.accompanist.swiperefresh)
     implementation(libs.retrofit2.converter.gson)
 

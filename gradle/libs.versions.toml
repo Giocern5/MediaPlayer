@@ -1,4 +1,5 @@
 [versions]
+accompanistPager = "0.30.1"
 accompanistSwiperefresh = "0.20.0"
 agp = "8.5.0"
 animation = "1.6.8"
@@ -40,6 +41,7 @@ pagingCommonAndroid = "3.3.5"
 
 
 [libraries]
+accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
 accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanistSwiperefresh" }
 androidx-animation = { module = "androidx.compose.animation:animation", version.ref = "animation" }
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }

@@ -1,20 +1,21 @@
 package com.suno.android.sunointerview.ui.screens.feed
 
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.VerticalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -36,81 +37,60 @@ import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.rounded.ThumbUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
 import com.suno.android.sunointerview.data.SongFeedData
-
-import  com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.suno.android.sunointerview.uitls.StringUtil
 
 @Composable
 fun MediaFeedScreen(viewModel: MediaFeedViewModel) {
-    val songs = viewModel.pagingFlow.collectAsLazyPagingItems()
-    var isRefreshing by remember { mutableStateOf(false) }
-    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing)
 
-    SwipeRefresh(
-        state = swipeRefreshState,
-        onRefresh = {
-            isRefreshing = true
-            songs.refresh()
-            isRefreshing = false
-        }
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = MaterialTheme.colorScheme.surfaceContainer)
-        ) {
-            SongsList(songs = songs, viewModel = viewModel)
-        }
-    }
+    val songs = viewModel.pagingFlow.collectAsLazyPagingItems()
+    SongsList(songs = songs, viewModel = viewModel)
+
 }
 
 @Composable
 fun SongsList(songs: LazyPagingItems<SongFeedData>, viewModel: MediaFeedViewModel) {
+
     when (songs.loadState.refresh) {
         is LoadState.Error -> {
             CenterContainer("Ooops, something went wrong! Please check internet or try again")
         }
         is LoadState.Loading -> {}
         is LoadState.NotLoading -> {
-            val listState = rememberLazyListState()
-            val flingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
-
-            LazyColumn(
-                state = listState,
-                flingBehavior = flingBehavior
-            ) {
-                items(songs.itemCount) { index ->
-                    songs[index]?.let {
-                        SongItem(song = it, viewModel = viewModel)
-                    }
+            val pagerState = rememberPagerState(
+                initialPage = 0,
+                pageCount = { songs.itemCount }
+            )
+            VerticalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                songs[page]?.let { song ->
+                    SongItem(song = song, viewModel = viewModel)
                 }
             }
         }
     }
 }
 
+
 @Composable
 fun SongItem(song: SongFeedData, viewModel: MediaFeedViewModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(9f / 16f)
-            .padding(8.dp),
+            .fillMaxSize()
+            .padding(0.dp),
         shape = RoundedCornerShape(8.dp),
     ) {
         Box(
@@ -173,9 +153,9 @@ fun SongItem(song: SongFeedData, viewModel: MediaFeedViewModel) {
     }
 }
 
-
 @Composable
 fun SongActionButtons(isLiked: Boolean, isTrashed: Boolean, likes: Int) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .wrapContentSize()
@@ -183,7 +163,7 @@ fun SongActionButtons(isLiked: Boolean, isTrashed: Boolean, likes: Int) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
 
-        IconButton(onClick = { /* toast? */ }) {
+        IconButton(onClick = { makeToast(context, "Like")}) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -199,7 +179,7 @@ fun SongActionButtons(isLiked: Boolean, isTrashed: Boolean, likes: Int) {
             }
         }
         //Created dislike button as it is not a default icons
-        IconButton(onClick = { /* toast? */ }) {
+        IconButton(onClick = { makeToast(context, "Dislike")}) {
             Icon(
                 imageVector = Icons.Rounded.ThumbUp,
                 contentDescription = "Dislike",
@@ -208,7 +188,7 @@ fun SongActionButtons(isLiked: Boolean, isTrashed: Boolean, likes: Int) {
             )
         }
 
-        IconButton(onClick = { /* toast? */ }) {
+        IconButton(onClick = { makeToast(context, "Open share") }) {
             Icon(
                 imageVector = Icons.Rounded.Share,
                 contentDescription = "Share",
@@ -216,7 +196,7 @@ fun SongActionButtons(isLiked: Boolean, isTrashed: Boolean, likes: Int) {
             )
         }
 
-        IconButton(onClick = { /* toast? */ }) {
+        IconButton(onClick = { makeToast(context, "open menu") }) {
             Icon(
                 imageVector = Icons.Rounded.Menu,
                 contentDescription = "Menu",
@@ -274,11 +254,8 @@ fun SongDetails(song: SongFeedData) {
 @Composable
 fun SongPlaybackButtons(songUrl: String, songLength: Double, viewModel: MediaFeedViewModel) {
 
-    DisposableEffect(songUrl) {
+    LaunchedEffect(songUrl) {
         viewModel.startSong(songUrl)
-        onDispose {
-            viewModel.stopSong()
-        }
     }
 
     Row(
@@ -336,4 +313,9 @@ fun CenterContainer(message: String) {
             )
         }
     }
+}
+
+// used just to show what would actually happen with the side button pannel
+private fun makeToast( context: Context, message: String) {
+    Toast.makeText(context, "This would ${message}", Toast.LENGTH_SHORT).show()
 }
