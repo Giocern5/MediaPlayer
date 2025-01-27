@@ -20,7 +20,7 @@ With more time I would fully implemented the analytics module, add swipe to refr
 <li>Pager 3: Used for Pagination</li>
 <li>Coil: Helps with image caching and loading</li>
 <li>Firebase Analytics: Used to track basic user interactions</li>
-<li>MediaPlayer: Used for Playing music</li>
+<li>Media3: Used for Playing music</li>
 <li>VerticalPager: Used for making the items scrollable 1 by 1</li>
 <li>Used a data mapper to help structure data better. For example, the ui does not need to know page size and such</li>
 <li>Misc: MVVM, Flows, Firebase Analytics, </li>    
