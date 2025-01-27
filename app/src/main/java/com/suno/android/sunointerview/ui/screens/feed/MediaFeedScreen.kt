@@ -2,7 +2,6 @@ package com.suno.android.sunointerview.ui.screens.feed
 
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -137,7 +136,10 @@ fun SongItem(song: SongFeedData, viewModel: MediaFeedViewModel) {
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)
                 ) {
                     SongDetails(song)
-                    SongPlaybackButtons(songUrl = song.audioUrl, songLength = song.songLength, viewModel = viewModel)
+                    SongPlaybackButtons(songUrl = song.audioUrl,
+                        songLength = song.songLength,
+                        viewModel = viewModel,
+                        songName = song.title)
                 }
 
                 Column(
@@ -252,10 +254,10 @@ fun SongDetails(song: SongFeedData) {
 }
 
 @Composable
-fun SongPlaybackButtons(songUrl: String, songLength: Double, viewModel: MediaFeedViewModel) {
+fun SongPlaybackButtons(songUrl: String, songLength: Double, viewModel: MediaFeedViewModel, songName: String) {
 
     LaunchedEffect(songUrl) {
-        viewModel.startSong(songUrl)
+        viewModel.startSong(songUrl, songName)
     }
 
     Row(

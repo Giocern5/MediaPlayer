@@ -59,6 +59,11 @@ android {
 
 dependencies {
 
+    // Import the BoM for the Firebase platform
+    implementation(platform(libs.firebase.bom))
+
+    implementation(libs.firebase.analytics)
+
     implementation( libs.accompanist.pager)
 
     implementation (libs.accompanist.swiperefresh)

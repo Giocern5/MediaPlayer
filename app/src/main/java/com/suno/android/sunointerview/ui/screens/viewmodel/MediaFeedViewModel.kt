@@ -10,12 +10,14 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import androidx.paging.cachedIn
 import androidx.lifecycle.*
+import com.suno.android.sunointerview.analytics.AnalyticsLogger
 import com.suno.android.sunointerview.data.SongFeedData
 
 @HiltViewModel
 class MediaFeedViewModel @Inject constructor(
-    repo: MediaFeedRepository
-): ViewModel() {
+    repo: MediaFeedRepository,
+    private val analyticsLogger: AnalyticsLogger,
+    ): ViewModel() {
 
     companion object {
         const val TAG = "MediaFeedViewModel"
@@ -26,7 +28,7 @@ class MediaFeedViewModel @Inject constructor(
 
     private val mediaPlayer = MediaPlayer()
 
-    fun startSong(songUrl: String) {
+    fun startSong(songUrl: String, songName: String) {
         try {
             mediaPlayer.reset()
             mediaPlayer.setDataSource(songUrl)
@@ -35,6 +37,7 @@ class MediaFeedViewModel @Inject constructor(
                 mediaPlayer.start()
             }
             Log.e(TAG, "Starting song")
+            analyticsLogger.logSong(songName)
         } catch (e: Exception) {
             Log.e(TAG, "Error starting song: ${e.message}")
         }
