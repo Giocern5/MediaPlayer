@@ -1,6 +1,5 @@
 package com.suno.android.sunointerview.ui.screens.feed
 
-import android.media.MediaPlayer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
@@ -56,19 +55,14 @@ import  com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.suno.android.sunointerview.uitls.StringUtil
 
-// App crashed on screen rotation, look into it
-// Fix button section,
 // if song ends, swipe to next or maybe restart?
 // update naming conventions
-// progress bar for song?
-// lower play bottom / restart
+// per logs, songs still play on fast swipe
 
 @Composable
 fun MediaFeedScreen(viewModel: MediaFeedViewModel) {
     val songs = viewModel.pagingFlow.collectAsLazyPagingItems()
-    val sharedMediaPlayer = remember { MediaPlayer() }
     var isRefreshing by remember { mutableStateOf(false) }
-
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing)
 
     SwipeRefresh(
@@ -84,20 +78,14 @@ fun MediaFeedScreen(viewModel: MediaFeedViewModel) {
                 .fillMaxSize()
                 .background(color = MaterialTheme.colorScheme.surfaceContainer)
         ) {
-            SongsList(songs = songs, mediaPlayer = sharedMediaPlayer)
-        }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            sharedMediaPlayer.release()
+            SongsList(songs = songs, viewModel = viewModel)
         }
     }
 }
 
 
 @Composable
-fun SongsList(songs: LazyPagingItems<SongFeedData>, mediaPlayer: MediaPlayer) {
+fun SongsList(songs: LazyPagingItems<SongFeedData>, viewModel: MediaFeedViewModel) {
     when (songs.loadState.refresh) {
         is LoadState.Error -> {
             CenterContainer("Ooops, something went wrong! Please check internet or try again")
@@ -114,7 +102,7 @@ fun SongsList(songs: LazyPagingItems<SongFeedData>, mediaPlayer: MediaPlayer) {
             ) {
                 items(songs.itemCount) { index ->
                     songs[index]?.let {
-                        SongItem(song = it, mediaPlayer = mediaPlayer)
+                        SongItem(song = it, viewModel = viewModel)
                     }
                 }
             }
@@ -123,7 +111,7 @@ fun SongsList(songs: LazyPagingItems<SongFeedData>, mediaPlayer: MediaPlayer) {
 }
 
 @Composable
-fun SongItem(song: SongFeedData, mediaPlayer: MediaPlayer) {
+fun SongItem(song: SongFeedData, viewModel: MediaFeedViewModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -175,7 +163,7 @@ fun SongItem(song: SongFeedData, mediaPlayer: MediaPlayer) {
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)
                 ) {
                     UserInfoSection(song)
-                    SongControls(songUrl = song.audioUrl, mediaPlayer = mediaPlayer)
+                    SongControls(songUrl = song.audioUrl, songLength = song.songLength, viewModel = viewModel)
                 }
 
                 Column(
@@ -277,9 +265,8 @@ fun UserInfoSection(song: SongFeedData) {
                             .size(32.dp)
                             .clip(RoundedCornerShape(16.dp))
                     )
+                }
             }
-        }
-
 
             Text(
                 text = song.displayName,
@@ -291,20 +278,12 @@ fun UserInfoSection(song: SongFeedData) {
 }
 
 @Composable
-fun SongControls(songUrl: String, mediaPlayer: MediaPlayer) {
-
-    var isPlaying by remember { mutableStateOf(false) }
+fun SongControls(songUrl: String, songLength: Double, viewModel: MediaFeedViewModel) {
 
     DisposableEffect(songUrl) {
-        mediaPlayer.reset()
-        mediaPlayer.setDataSource(songUrl)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            mediaPlayer.start()
-            isPlaying = true
-        }
+        viewModel.startSong(songUrl)
         onDispose {
-            mediaPlayer.stop()
+            viewModel.stopSong()
         }
     }
 
@@ -317,11 +296,7 @@ fun SongControls(songUrl: String, mediaPlayer: MediaPlayer) {
 
         IconButton(
             onClick = {
-                mediaPlayer.seekTo(0)
-                if (!isPlaying) {
-                    mediaPlayer.start()
-                    isPlaying = true
-                }
+                viewModel.resetSong()
             }
         ) {
             Icon(
@@ -333,13 +308,7 @@ fun SongControls(songUrl: String, mediaPlayer: MediaPlayer) {
 
         IconButton(
             onClick = {
-                if (isPlaying) {
-                    mediaPlayer.pause()
-                    isPlaying = false
-                } else {
-                    mediaPlayer.start()
-                    isPlaying = true
-                }
+                viewModel.toggleSong()
             }
         ) {
             Icon(
@@ -348,6 +317,12 @@ fun SongControls(songUrl: String, mediaPlayer: MediaPlayer) {
                 tint = MaterialTheme.colorScheme.background
             )
         }
+
+        Text(
+            text = StringUtil.formatDuration(songLength),
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
     }
 }
 

@@ -2,7 +2,6 @@ package com.suno.android.sunointerview.data
 
 import com.google.gson.annotations.SerializedName
 
-
 data class ApiResponse(
     @SerializedName("end") val end: Int?,
     @SerializedName("page") val page: Int?,
@@ -50,7 +49,8 @@ data class SongFeedData(
     val displayName: String,
     val isLiked: Boolean,
     val isTrashed: Boolean,
-    val likes: Int
+    val likes: Int,
+    val songLength: Double
 )
 
 // defaults. will change after seeing what i want to use
@@ -65,7 +65,8 @@ fun Song.toFeedSong(): SongFeedData {
         displayName = displayName ?: "",
         isLiked = isLiked ?: false,
         isTrashed = isTrashed ?: false,
-        likes = upvoteCount ?: 0
+        likes = upvoteCount ?: 0,
+        songLength = metadata?.duration ?: 0.0
     )
 }
 
